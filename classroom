@@ -1,0 +1,554 @@
+https://els.teamleaseedtech.com/mod/url/view.php?id=33653
+
+Jenkins installation:
+---------------
+
+you should install the long term support release,you are not suppose to install the weekly release
+
+first install wget package.
+
+yum install wget
+
+wget -O /etc/yum.repos.d/jenkins.repo \https://pkg.jenkins.io/redhat-stable/jenkins.repo
+
+or 
+
+wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo(install the related package from jenkins repo)
+
+rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key(import the kep)
+
+yum install jenkins java-11-openjdk-devel
+
+systemctl daemon-reload
+
+systemctl start jenkins
+systemctl status jenkins
+
+maven based project git URL:
+-------------------------
+https://github.com/jenkins-docs/simple-java-maven-app.git(you should it added in source code management of git)
+
+it will be the  project develoed in java and it will build the package using maven and we are integrating it jekins ,using git URL)
+
+by seeing pom.xml - you shoul
+d identify the code is built in  java and we are using maven for building tge package)-except qbol maven will make the packages of all language.
+
+
+we got the probelm with installed maven ,we have unistalled it and re-installed it.
+
+yum remove maven
+   63  cd /usr/local/
+   64  https://mirrors.estointernet.in/apache/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz(get the url serach in google for maben download)
+   65  wget https://mirrors.estointernet.in/apache/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz
+   66  tar xzf apache-maven-3.8.1-bin.tar.gz
+   67  ln -s apache-maven-3.8.1 maven
+   68   vi /etc/profile.d/maven.sh
+export M2_HOME=/usr/local/maven
+export PATH=${M2_HOME}/bin:${PATH}
+
+   69  source /etc/profile.d/maven.sh
+   70  mvn --version
+https://download.docker.com/linux/centos/7/$basearch/stable 480
+
+Docker installation:
+ yum install -y yum-utils
+  104  yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+  105  yum install docker-ce docker-ce-cli containerd.io
+  106  systemctl start docker
+  107  systemctl enable docker
+  108  systemctl status docker
+  109  docker --version
+  110  history
+
+
+Once we install docker we can uninstall jenkins,bcs we can install jenkins in docker container.
+
+ systemctl stop jenkins
+ systemctl disable jenkins
+
+biulding docker container using  the images in docker hub:
+----------------------------------------------------------
+on one server we are runnning 4 conatines now
+124  docker ps
+  125  docker container run --publish 87:80 --detach httpd
+  126  docker images
+  127  docker ps
+  128  docker container run --publish 8080:80 --detach --name mytomcat tomcat
+  129  docker ps	
+  130  docker container run --publish 83:80 --detach --name proxy nginx
+  131  docker ps
+
+[root@ip-172-31-1-57 ~]# docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                               NAMES
+ab91cb37183d   nginx     "/docker-entrypoint.…"   7 seconds ago    Up 6 seconds    0.0.0.0:83->80/tcp, :::83->80/tcp   proxy
+3a0cb9c4a13e   httpd     "httpd-foreground"       36 seconds ago   Up 35 seconds   0.0.0.0:82->80/tcp, :::82->80/tcp   webhost
+d9e62e0ec5b5   httpd     "httpd-foreground"       55 seconds ago   Up 54 seconds   0.0.0.0:81->80/tcp, :::81->80/tcp   admiring_jemison
+899b62453678   httpd     "httpd-foreground"       9 minutes ago    Up 8 minutes    0.0.0.0:80->80/tcp, :::80->80/tcp   confident_nightingale
+[root@ip-172-31-1-57 ~]#
+
+
+
+158  docker stop eafd
+  159  docker ps -a
+  160  docker rm eaf
+  161  history
+  162  docker ps
+  163  docker top 2bdcf
+  164  top
+  165  docker top 2bdcf
+  166  docker ps
+  167  curl localhost:80
+  168  docker container logs 2bdc
+  169  curl localhost:80
+  170  docker container logs 2bdc
+
+
+docker container stats
+
+docker container run --publish 85:80 nginx (conatiner will be running in foreground)
+
+if you wanted remove container,first youstop it and then you remove it
+ 228  docker stop ab91c
+  229  docker rm ab91c
+
+ip a
+
+--detach - -d (short form)
+
+--publish - -p(short form)
+
+206  docker run --detach nginx
+  207  docker ps
+  208  docker run -p 80:80 -d nginx(-p or --publish means we are exposing the conatiner to the outsie world)
+  209  docker ps
+  210  docker run -p 80:80 -d nginx
+  211  docker network ls
+  212  docker network inspect bridge
+
+docker engine instllation resolution in red hat:
+----------------------------------------------
+After adding the repo using
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+edit the local docker-ce.repo file at
+
+/etc/yum.repos.d/docker-ce.repo
+
+change the baseurl for docker-ce-stable to
+
+https://download.docker.com/linux/centos/7/$basearch/stable 480
+
+Essentially, you are overriding the expanded value of $releasever (in my case resulted in 7.6).
+
+
+then run below command:
+yum install -y yum-utils
+  104  yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+  105  yum install docker-ce docker-ce-cli containerd.io
+  106  systemctl start docker
+  107  systemctl enable docker
+  108  systemctl status docker
+  109  docker --version
+
+
+--------
+
+docker commands:
+------------
+[root@ip-172-31-24-100 ~]# docker --help
+
+Usage:  docker [OPTIONS] COMMAND
+
+A self-sufficient runtime for containers
+
+Options:
+      --config string      Location of client config files (default "/root/.docker")
+  -c, --context string     Name of the context to use to connect to the daemon (overrides DOCKER_HOST env var and default context set with "docker context use")
+  -D, --debug              Enable debug mode
+  -H, --host list          Daemon socket(s) to connect to
+  -l, --log-level string   Set the logging level ("debug"|"info"|"warn"|"error"|"fatal") (default "info")
+      --tls                Use TLS; implied by --tlsverify
+      --tlscacert string   Trust certs signed only by this CA (default "/root/.docker/ca.pem")
+      --tlscert string     Path to TLS certificate file (default "/root/.docker/cert.pem")
+      --tlskey string      Path to TLS key file (default "/root/.docker/key.pem")
+      --tlsverify          Use TLS and verify the remote
+  -v, --version            Print version information and quit
+
+Management Commands:
+  app*        Docker App (Docker Inc., v0.9.1-beta3)
+  builder     Manage builds
+  buildx*     Build with BuildKit (Docker Inc., v0.5.1-docker)
+  config      Manage Docker configs
+  container   Manage containers
+  context     Manage contexts
+  image       Manage images
+  manifest    Manage Docker image manifests and manifest lists
+  network     Manage networks
+  node        Manage Swarm nodes
+  plugin      Manage plugins
+  scan*       Docker Scan (Docker Inc., v0.8.0)
+  secret      Manage Docker secrets
+  service     Manage services
+  stack       Manage Docker stacks
+  swarm       Manage Swarm
+  system      Manage Docker
+  trust       Manage trust on Docker images
+  volume      Manage volumes
+
+Commands:
+  attach      Attach local standard input, output, and error streams to a running container
+  build       Build an image from a Dockerfile
+  commit      Create a new image from a container's changes
+  cp          Copy files/folders between a container and the local filesystem
+  create      Create a new container
+  diff        Inspect changes to files or directories on a container's filesystem
+  events      Get real time events from the server
+  exec        Run a command in a running container
+  export      Export a container's filesystem as a tar archive
+  history     Show the history of an image
+  images      List images
+  import      Import the contents from a tarball to create a filesystem image
+  info        Display system-wide information
+  inspect     Return low-level information on Docker objects
+  kill        Kill one or more running containers
+  load        Load an image from a tar archive or STDIN
+  login       Log in to a Docker registry
+  logout      Log out from a Docker registry
+  logs        Fetch the logs of a container
+  pause       Pause all processes within one or more containers
+  port        List port mappings or a specific mapping for the container
+  ps          List containers
+  pull        Pull an image or a repository from a registry
+  push        Push an image or a repository to a registry
+  rename      Rename a container
+  restart     Restart one or more containers
+  rm          Remove one or more containers
+  rmi         Remove one or more images
+  run         Run a command in a new container
+  save        Save one or more images to a tar archive (streamed to STDOUT by default)
+  search      Search the Docker Hub for images
+  start       Start one or more stopped containers
+  stats       Display a live stream of container(s) resource usage statistics
+  stop        Stop one or more running containers
+  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+  top         Display the running processes of a container
+  unpause     Unpause all processes within one or more containers
+  update      Update configuration of one or more containers
+  version     Show the Docker version information
+  wait        Block until one or more containers stop, then print their exit codes
+
+Run 'docker COMMAND --help' for more information on a command.
+
+Docker file explanation:
+-----------------------
+mkdir  java-docker-application
+Sample.java
+
+ class Sample{ 
+   public static void main(String[] args)  { 
+   System.out.println("This is java application by using docker ");
+   } 
+   }
+
+
+vi Dockerfile
+FROM java:8
+   COPY . /var/www/java
+   WORKDIR /var/www/java
+   RUN javac Sample.java
+   EXPOSE 9000
+   CMD ["java", "Sample"]
+
+docker build -t javaapp .
+
+FROM - Specifies the base image that the Dockerfile will use to build a new image. 
+
+MAINTAINER - Specifies the Dockerfile Author Name and his/her email.
+
+RUN - Runs any UNIX command to build the image.
+
+ENV - Sets the environment variables. For this post, JAVA_HOME is the variable that is set.
+
+CMD - Provides the facility to run commands at the start of container. This can be overridden upon executing the docker run command.
+
+ADD - This instruction copies the new files, directories into the Docker container file system at specified destination.
+
+EXPOSE - This instruction exposes specified port to the host machine.
+
+-----------------
+
+[root@ip-172-31-24-100 ~]# passwd ec2-user
+Changing password for user ec2-user.
+New password:
+Retype new password:
+passwd: all authentication tokens updated successfully.
+[root@ip-172-31-24-100 ~]# pwd
+/root
+[root@ip-172-31-24-100 ~]# cd /etc/ssh/sshd_config
+-bash: cd: /etc/ssh/sshd_config: Not a directory
+[root@ip-172-31-24-100 ~]# vi /etc/ssh/sshd_config
+[root@ip-172-31-24-100 ~]# service sshd
+
+
+18.219.9.184     
+3.142.195.102
+---------------------------
+3.142.195.102
+hcladmin	SBSGQ$92567
+
+
+223  docker run -d -p 3306:3306 --name db -e MYSQL_RANDOM_ROOT_PASSWORD=true mysql
+  224  docker ps
+  225  docker exec -it db bash
+  226  docker logs db
+ mysql -u root -p
+ exit
+exit
+
+
+223  docker run -d --name db -e MYSQL_ALLOW_EMPTY_PASSWORD=true -v mysql-db:/var/lib/mysql mysql:8.0.25
+  224  docker ps
+  225  docker container inspect 6ef9
+  226  docker volume ls
+  227  docker volume inspect mysql-db
+  228  cd /var/lib/docker/volumes/mysql-db/_data
+
+235  docker rm 6ef
+  236  docker ps
+  237  docker volume ls
+  238  docker run -d --name db -e MYSQL_ALLOW_EMPTY_PASSWORD=true -v mysql-db:/var/lib/mysql mysql:8.0
+  239  docker ps
+  240  docker container inspect db
+
+we can attach the volume for running container
+we have to stop the container and attach it and start it.
+
+HelloWorld.java
+// Your First Program
+
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+
+
+javac HelloWorld.java
+java HelloWorld
+vi manifest.txt
+[root@ip-172-31-11-123 javaapp]# cat manifest.txt
+Manifest-Version: 1.0
+Created-By: Me
+Main-Class: HelloWorld
+#DJR62XmMcim59R6jj
+
+build a jat file:  
+-----------------
+
+jar cfm HelloWorld.jar manifest.txt HelloWorld.Class(building a jar file using class file)
+java -jar HelloWorld.jar(executing the jar file)
+
+FROM java:8(spin up te image using java 8)
+WORKDIR /(working directory in container is / folder)
+ADD HelloWorld.jar(source) HelloWorld.jar(destination in conatiner)
+EXPOSE 8080(expose the app in internally in docker engine)
+CMD java -jar HelloWorld.jar(command to be run)
+
+pushing images to docker hub into your registry;
+--------------------------------------------------
+  343  docker login
+  344  docker images
+  345  docker tag 2523598370cc nssuresh21/myspringapp:v1
+  346  docker push nssuresh21/myspringapp:v1
+  347  docker images
+
+installatin of docker compose:
+-------------------------------
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  346  sudo chmod +x /usr/local/bin/docker-compose
+  347  sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+
+docker pull gopal1409/springapp
+ 368  mkdir project
+  369  cd project
+  370  vi docker-compose.yaml
+  371  docker-compose up
+  372  docker-compose up -d
+  373  docker ps
+  374  docker network ls 5bda475b1c6d
+  375  docker network ls
+  376  docker volume ls
+  377  ex
+  378   docker network ls
+  379   docker network inspect wordpress_default
+  380   docker network inspect    project_default
+  381  docker ps
+  382  docker exec -it a2008af446be bash
+  383  docker ps
+  384  docker exce -it a200 bash
+  385  docker exec -it a200 bash
+  386  history
+
+me6OetYYd3Zxb1RIs5
+mysql -u root -p
+http://18.218.247.52:8000/
+http://18.218.247.52:8000/
+
+-----------
+54.213.235.159
+
+172565941
+K8s:Kubernetes
+-----
+traffic management - injector service (istio)and logic manager
+Kubernetes,also know as K8s,is an open source system for for automating deployment,scaling,and management of containerized applications.
+
+Automated rollouts and rollbacks:
+Service discovery and load balancing
+Storage orchestration
+Secret and configuration management
+Automatic bin packing
+Batch execution
+IPv4/IPv6 dual-stack
+Horizontal scaling
+Self-healing
+Designed for extensibility
+
+docker run -d --name devtest -v myvol2:/app nginx:latest
+  
+  
+  437  git pull
+  438  kubectl apply -f pod.yml
+  439  kubectl get pod
+  441  kubectl edit pod myapp-pod
+
+
+
+41  kubectl edit pod myapp-pod
+  
+  How to delete a pod and service
+  448  kubectl get pod
+  449  kubectl delete pod my-first-pod
+  450  kubectl get pod
+  451  kubectl delete -f pod.yml
+  452  kubectl get svc
+  453  kubectl describe svc
+  454  kubectl get svc
+  455  kubectl delete svc my-first-service
+
+
+Kubernetes installation: Kubernetes class started on Junly14th:
+-------------------------
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
+
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+
+sudo sysctl --system
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+exclude=kubelet kubeadm kubectl
+EOF
+
+
+   kubeadm init --pod-network-cidr=10.244.0.0/16
+     mkdir -p $HOME/.kube
+     sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+      sudo chown $(id -u):$(id -g) $HOME/.kube/config
+   kubectl get nodes
+   kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
+  kubectl get nodes
+kubectl taint nodes --all node-role.kubernetes.io/master-
+
+
+creating pod :
+----------
+411  kubectl run my-first-pod --image stacksimplify/kubenginx:1.0.0
+  412  kubectl get pod
+  413  kubectl describe pod my-first-pod
+
+How to expose your pod :
+  418  kubectl get svc
+  419  kubectl expose pod my-first-pod --type=NodePort --port=80 --name=my-first-service
+  421  kubectl get svc
+  422  kubectl get pod
+  423  kubectl get pod -o wide
+  424  kubectl get svc
+  425  kubectl describe svc my-first-service
+
+ow to run a yaml file
+   437  git pull
+  438  kubectl apply -f pod.yml
+  439  kubectl get pod
+  440  kubectl edit pod my-first-pod
+  441  kubectl edit pod myapp-pod
+
+How to delete a pod and service
+  448  kubectl get pod
+  449  kubectl delete pod my-first-pod
+  450  kubectl get pod
+  451  kubectl delete -f pod.yml
+  452  kubectl get svc
+  453  kubectl describe svc
+  454  kubectl get svc
+  455  kubectl delete svc my-first-service
+
+example how to give entries to /ect
+
+One or more machines running a deb/rpm-compatible Linux OS; for example: Ubuntu or CentOS.
+2 GiB or more of RAM per machine--any less leaves little room for your apps.
+At least 2 CPUs on the machine that you use as a control-plane node.
+Full network connectivity among all machines in the cluster. You can use either a public or a private network.
+less /proc/meminfo
+
+
+pom.yaml:
+apiVersion: v1 #string
+kind: Pod #string
+metadata:
+  name: myapp-pod #name of the pod
+  labels: #disctionary format of python
+    app: myapp
+
+spec:
+  containers: #List
+  - name: myapp
+    image: stacksimplify/kubenginx:1.0.0
+    ports:
+      - containerPort: 80
+        protocol: "TCP"
+
+
+511  kubectl set image deployment nginx-deployment nginx=piuma/phpsysinfo --record
+  512  kubectl get deploy
+  513  kubectl get rs
+  514  kubectl get pod
+  515  kubectl get pod -o wide
+
+525  kubectl set image deployment nginx-deployment nginx=1.0.12 --record
+  526  kubectl rollout status deployment nginx-deployment
+  527  kubectl get rs
+kubectl rollout history deploy nginx-deployment
+
+533  kubectl rollout undo deploy nginx-deployment
+  534  kubectl get pod
+  535  kubectl get rs
+
+
+Installation of Ansible:
+-------------------------
+
+  839  yum install epel-release
+  840  yum install ansible
